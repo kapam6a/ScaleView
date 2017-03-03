@@ -71,23 +71,25 @@ class AgeScaleView: UIView {
             beganPoint = gesture.location(in: self)
         }
         
-        changedPoint = gesture.location(in: self)
-        let angle = atan2(changedPoint.y - center.y, changedPoint.x - center.x)  - atan2(beganPoint.y - center.y, beganPoint.x - center.x)
-        transform = transform.rotated(by: angle)
+        if gesture.state == .changed {
+            changedPoint = gesture.location(in: self)
+            let angle = atan2(changedPoint.y - center.y, changedPoint.x - center.x)  - atan2(beganPoint.y - center.y, beganPoint.x - center.x)
+            transform = transform.rotated(by: angle)
+        }
         
         if gesture.state == .ended {
             let velocity = gesture.velocity(in: self.superview)
             
-            let rotationsNumber = Int ( Int(velocity.y) / 960)
-            print(rotationsNumber)
-//            let angle = atan2(velocity.y - center.y, velocity.x - center.x) - atan2(changedPoint.y - center.y, changedPoint.x - center.x)
+            let rotationAngle = velocity.y / (360 * 4) * CGFloat(M_PI)
+    
             let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
-            //rotateAnimation.fromValue = atan2(changedPoint.y - center.y, changedPoint.x - center.x)
-     //       rotateAnimation.toValue = atan2(changedPoint.y - center.y, changedPoint.x - center.x) + CGFloat(M_PI) * CGFloat(rotationsNumber)//atan2(velocity.y - center.y, velocity.x - center.x) +
-            rotateAnimation.duration = 1
+            rotateAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+            rotateAnimation.toValue =  -rotationAngle
+            rotateAnimation.duration = 2
         
-            self.layer.add(rotateAnimation, forKey: nil)
+            layer.add(rotateAnimation, forKey: nil)
         }
+
     }
 }
 
